@@ -13,32 +13,36 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 const modals = () => {
-  const popup = document.querySelector('.popup_engineer'),
-    popup_btn = document.querySelector('.popup_engineer_btn'),
-    popup_close = document.querySelector('.popup_engineer .popup_close');
-  function bindModal(trigger, modal, close) {
-    trigger.addEventListener('click', e => {
-      if (e.target) {
-        e.preventDefault();
-      }
-      modal.style.display = 'block';
-      // document.body.style.overflow  = 'hidden';
-      document.body.classList.add('modal-open');
+  function bindModal(triggerSelector, modalSelector, closeSelector) {
+    const trigger = document.querySelectorAll(triggerSelector),
+      // можно повесить на несколько селекторов одни и те же функции 
+      modal = document.querySelector(modalSelector),
+      close = document.querySelector(closeSelector);
+    trigger.forEach(item => {
+      item.addEventListener('click', e => {
+        if (e.target) {
+          e.preventDefault();
+        }
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        // document.body.classList.add('modal-open');
+      });
     });
     close.addEventListener('click', () => {
       modal.style.display = 'none';
-      // document.body.style.overflow  = '';
-      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+      // document.body.classList.remove('modal-open');
     });
     modal.addEventListener('click', e => {
       if (e.target === modal) {
         modal.style.display = 'none';
-        // document.body.style.overflow  = '';
-        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        // document.body.classList.remove('modal-open');
       }
     });
   }
-  bindModal(popup_btn, popup, popup_close);
+  bindModal('.popup_engineer_btn', '.popup_engineer', '.popup_engineer .popup_close'); // вместо переменных передаем сразу селекторы. И функция становится универсальной для открытия окон при клике на другие тригеры.
+  bindModal('.phone_link', '.popup', '.popup .popup_close');
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (modals);
 
