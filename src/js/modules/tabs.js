@@ -1,4 +1,4 @@
-const tabs = (headerSelector, tabSelector, contentSelector, activeClass) =>  { // при вызове функции нужно понять нужно ли стаивть точку перед классом или нет
+const tabs = (headerSelector, tabSelector, contentSelector, activeClass, display = 'block') =>  { // при вызове функции нужно понять нужно ли стаивть точку перед классом или нет
    const header = document.querySelector(headerSelector),
         tabs = document.querySelectorAll(tabSelector),
         contents = document.querySelectorAll(contentSelector);
@@ -14,7 +14,7 @@ const tabs = (headerSelector, tabSelector, contentSelector, activeClass) =>  { /
         }
 
         function showTabContent(i = 0) { // 0 нужен чтоб по умолчанию отобразить первый таб  с контентом
-          contents[i].style.display = 'block';
+          contents[i].style.display = display; // значение display нужно для применения этой функции для других элементов (картинок в модальном окне popup_calc)
           tabs[i].classList.add(activeClass);
         }
 
