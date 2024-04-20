@@ -1,4 +1,4 @@
-const tabs = (headerSelector, tabSelector, contentSelector, activeClass, display = 'block') =>  { // при вызове функции нужно понять нужно ли стаивть точку перед классом или нет
+const tabs = (headerSelector, tabSelector, contentSelector, activeClass, display = 'block') =>  { // при вызове функции нужно понять нужно ли стаивть точку перед классом или нет потому что работаем с classList
    const header = document.querySelector(headerSelector),
         tabs = document.querySelectorAll(tabSelector),
         contents = document.querySelectorAll(contentSelector);

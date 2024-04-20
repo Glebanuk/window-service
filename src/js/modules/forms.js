@@ -1,13 +1,11 @@
+import checkNumInputs from "./checkNumInputs";
+
 const forms = ()  =>  {
   const form = document.querySelectorAll('form'),
        inputs = document.querySelectorAll('input'),
        phoneInputs = document.querySelectorAll('input[name="user_phone"]');// эта переменная для функционала в котором полтзователь может вводитТОЛЬКО цифры
 
-       phoneInputs.forEach(item =>  { // этот код нужен для проверки и замены данных в поле "номер телефона" на числа
-        item.addEventListener('input',  ()  =>  {
-          item.value = item.value.replace(/\D/, '');// если пользователь ввел НЕ число то это reg exp заменяет содержимое на пустое место
-        });
-       });
+       checkNumInputs(phoneInputs);
 
        const message  = {
         loading:  'Загрузка...',
