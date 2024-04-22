@@ -1,6 +1,6 @@
 import checkNumInputs from "./checkNumInputs";
 
-const forms = ()  =>  {
+const forms = (state)  =>  { // для state будет аргументом обеъкт modalState который меняется в модуле changeModalState 
   const form = document.querySelectorAll('form'),
        inputs = document.querySelectorAll('input'),
        phoneInputs = document.querySelectorAll('input[name="user_phone"]');// эта переменная для функционала в котором полтзователь может вводитТОЛЬКО цифры
@@ -31,7 +31,7 @@ const forms = ()  =>  {
         };
 
        form.forEach(item  =>  {
-          item.addEventListener('submit', (e) => { //событие submit есть только еслив разметке используется тэг form
+          item.addEventListener('submit', (e) => { //событие submit есть только если в разметке используется тэг form
             e.preventDefault();
 
             let statusMessage = document.createElement('div');
@@ -40,6 +40,12 @@ const forms = ()  =>  {
 
             const formData  = new FormData(item); // этот объект найдет все данные полей ввода и соборет их в специальную структуру (объект)
             
+            if (item.getAttribute('data-calc') === 'end') { // этот блок кода нужен для отправки данных на сервер которые приходят из modalState (см. параметры функции forms)
+              for (let key in state)  {
+                formData.append(key, state[key]);
+              }
+            }
+
             postData('assets/server.php', formData)
               .then(res =>  {
                 console.log(res);
