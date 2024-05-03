@@ -1,6 +1,107 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./src/js/modules/changeModalState.js":
+/*!********************************************!*\
+  !*** ./src/js/modules/changeModalState.js ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _checkNumInputs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./checkNumInputs */ "./src/js/modules/checkNumInputs.js");
+
+const changeModalState = state => {
+  const windowForm = document.querySelectorAll('.balcon_icons_img'),
+    windowWidth = document.querySelectorAll('#width'),
+    windowHeight = document.querySelectorAll('#height'),
+    windowType = document.querySelectorAll('#view_type'),
+    windowProfile = document.querySelectorAll('.checkbox'),
+    form = document.querySelector('[data-calc = "end"]');
+  (0,_checkNumInputs__WEBPACK_IMPORTED_MODULE_0__["default"])('#width');
+  (0,_checkNumInputs__WEBPACK_IMPORTED_MODULE_0__["default"])('#height');
+  function bindActionToElems(event, elem, prop) {
+    elem.forEach((item, i) => {
+      // индекс нужен для выявления в какую картинку окна нажал пользователь
+      item.addEventListener(event, () => {
+        switch (item.nodeName) {
+          case 'SPAN':
+            // нужно использовать верхний регистр для команды nodeName
+            state[prop] = i;
+            break;
+          case 'INPUT':
+            if (item.getAttribute('type') === 'checkbox') {
+              i === 0 ? state[prop] = 'Холодное' : state[prop] = 'Теплое'; // так как всего два чекбокса на странице проверяем какой выбран с помощью тернарника
+              elem.forEach((box, j) => {
+                // используем j так как i уже занято
+                box.checked = false;
+                if (i == j) {
+                  box.checked = true;
+                }
+              });
+            } else {
+              state[prop] = item.value;
+            }
+            break;
+          case 'SELECT':
+            state[prop] = item.value;
+            break;
+        }
+        console.log(state);
+      });
+    });
+  }
+  function clearStateAndCloseWindow() {
+    //
+    for (let key in state) {
+      delete state[key];
+    }
+    ;
+    console.log('Modal state cleared:');
+    setTimeout(() => {
+      document.querySelector('.popup_calc_end').style.display = 'none';
+      document.querySelector('body').style.overflow = '';
+    }, 3000);
+  }
+  ;
+  form.addEventListener('submit', clearStateAndCloseWindow);
+  bindActionToElems('click', windowForm, 'form ');
+  bindActionToElems('input', windowWidth, 'width ');
+  bindActionToElems('input', windowHeight, 'height');
+  bindActionToElems('change', windowType, 'type');
+  bindActionToElems('change', windowProfile, 'profile');
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (changeModalState);
+
+/***/ }),
+
+/***/ "./src/js/modules/checkNumInputs.js":
+/*!******************************************!*\
+  !*** ./src/js/modules/checkNumInputs.js ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+const checkNumInputs = selector => {
+  const numIniputs = document.querySelectorAll('selector');
+  numIniputs.forEach(item => {
+    // этот код нужен для проверки и замены данных в поле "номер телефона" на числа
+    item.addEventListener('input', () => {
+      item.value = item.value.replace(/\D/, ''); // если пользователь ввел НЕ число то это reg exp заменяет содержимое на пустое место
+    });
+  });
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (checkNumInputs);
+
+/***/ }),
+
 /***/ "./src/js/modules/forms.js":
 /*!*********************************!*\
   !*** ./src/js/modules/forms.js ***!
@@ -12,9 +113,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-const forms = () => {
+/* harmony import */ var _checkNumInputs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./checkNumInputs */ "./src/js/modules/checkNumInputs.js");
+
+const forms = state => {
+  // для state будет аргументом обеъкт modalState который меняется в модуле changeModalState 
   const form = document.querySelectorAll('form'),
-    inputs = document.querySelectorAll('input');
+    inputs = document.querySelectorAll('input'),
+    phoneInputs = document.querySelectorAll('input[name="user_phone"]'); // эта переменная для функционала в котором полтзователь может вводитТОЛЬКО цифры
+
+  (0,_checkNumInputs__WEBPACK_IMPORTED_MODULE_0__["default"])(phoneInputs);
   const message = {
     loading: 'Загрузка...',
     success: 'Спасибо с вами свяжутся!',
@@ -36,13 +143,19 @@ const forms = () => {
   };
   form.forEach(item => {
     item.addEventListener('submit', e => {
-      //событие submit есть только еслив разметке используется тэг form
+      //событие submit есть только если в разметке используется тэг form
       e.preventDefault();
       let statusMessage = document.createElement('div');
       statusMessage.classList.add('status'); // добавляем класс который создан в css
       item.appendChild(statusMessage);
       const formData = new FormData(item); // этот объект найдет все данные полей ввода и соборет их в специальную структуру (объект)
 
+      if (item.getAttribute('data-calc') === 'end') {
+        // этот блок кода нужен для отправки данных на сервер которые приходят из modalState (см. параметры функции forms)
+        for (let key in state) {
+          formData.append(key, state[key]);
+        }
+      }
       postData('assets/server.php', formData).then(res => {
         console.log(res);
         statusMessage.textContent = message.success;
@@ -50,7 +163,7 @@ const forms = () => {
         clearInputs();
         setTimeout(() => {
           statusMessage.remove();
-        }, 3000);
+        }, 7000);
       });
     });
   });
@@ -71,18 +184,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 const modals = () => {
-  function bindModal(triggerSelector, modalSelector, closeSelector) {
+  function bindModal(triggerSelector, modalSelector, closeSelector, closeCLickOverlay = true) {
+    // 'closeCLickOverlay' для контроля закрытия мод окна на подложку(какое будет а какое нет)
     const trigger = document.querySelectorAll(triggerSelector),
       // можно повесить на несколько селекторов одни и те же функции 
       modal = document.querySelector(modalSelector),
-      close = document.querySelector(closeSelector);
+      close = document.querySelector(closeSelector),
+      windows = document.querySelectorAll('[data-modal]'); // получаем все модальные окна чтоб они не наслаивались друг на друга как в modal_calc
+
     trigger.forEach(item => {
       item.addEventListener('click', e => {
         if (e.target) {
           e.preventDefault();
         }
+        windows.forEach(item => {
+          // этот код закрывает все ненужные открытые окна
+          item.style.display = 'none';
+        });
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
+
         // document.body.classList.add('modal-open');
       });
     });
@@ -92,7 +213,10 @@ const modals = () => {
       // document.body.classList.remove('modal-open');
     });
     modal.addEventListener('click', e => {
-      if (e.target === modal) {
+      if (e.target === modal && closeCLickOverlay) {
+        windows.forEach(item => {
+          item.style.display = 'none';
+        });
         modal.style.display = 'none';
         document.body.style.overflow = '';
         // document.body.classList.remove('modal-open');
@@ -107,6 +231,9 @@ const modals = () => {
   }
   bindModal('.popup_engineer_btn', '.popup_engineer', '.popup_engineer .popup_close'); // вместо переменных передаем сразу селекторы. И функция становится универсальной для открытия окон при клике на другие тригеры.
   bindModal('.phone_link', '.popup', '.popup .popup_close');
+  bindModal('.popup_calc_btn', '.popup_calc', '.popup_calc_close');
+  bindModal('.popup_calc_button', '.popup_calc_profile', '.popup_calc_profile_close', false);
+  bindModal('.popup_calc_profile_button', '.popup_calc_end', '.popup_calc_end_close', false);
   // showModalByTime('.popup', 6000);
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (modals);
@@ -124,8 +251,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-const tabs = (headerSelector, tabSelector, contentSelector, activeClass) => {
-  // при вызове функции нужно понять нужно ли стаивть точку перед классом или нет
+const tabs = (headerSelector, tabSelector, contentSelector, activeClass, display = 'block') => {
+  // при вызове функции нужно понять нужно ли стаивть точку перед классом или нет потому что работаем с classList
   const header = document.querySelector(headerSelector),
     tabs = document.querySelectorAll(tabSelector),
     contents = document.querySelectorAll(contentSelector);
@@ -139,7 +266,7 @@ const tabs = (headerSelector, tabSelector, contentSelector, activeClass) => {
   }
   function showTabContent(i = 0) {
     // 0 нужен чтоб по умолчанию отобразить первый таб  с контентом
-    contents[i].style.display = 'block';
+    contents[i].style.display = display; // значение display нужно для применения этой функции для других элементов (картинок в модальном окне popup_calc)
     tabs[i].classList.add(activeClass);
   }
   hideTabContent(); // сразу вызываем функции во избежания неполадок в css (так надежнее)
@@ -164,6 +291,70 @@ const tabs = (headerSelector, tabSelector, contentSelector, activeClass) => {
   });
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (tabs);
+
+/***/ }),
+
+/***/ "./src/js/modules/timer.js":
+/*!*********************************!*\
+  !*** ./src/js/modules/timer.js ***!
+  \*********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+const timer = (id, deadline) => {
+  const addZero = num => {
+    if (num <= 9) {
+      return '0' + num;
+    } else {
+      return num;
+    }
+  };
+  const getTimeRemaining = endtime => {
+    const t = Date.parse(endtime) - Date.parse(new Date()),
+      seconds = Math.floor(t / 1000 % 60),
+      minutes = Math.floor(t / 1000 / 60 % 60),
+      hours = Math.floor(t / (1000 * 60 * 60) % 24),
+      days = Math.floor(t / (1000 * 60 * 60 * 24));
+    return {
+      "total": t,
+      "days": days,
+      "hours": hours,
+      "minutes": minutes,
+      "seconds": seconds
+    };
+  };
+  const setClock = (selector, endtime) => {
+    const timer = document.querySelector(selector),
+      days = timer.querySelector("#days"),
+      hours = timer.querySelector("#hours"),
+      minutes = timer.querySelector("#minutes"),
+      seconds = timer.querySelector("#seconds"),
+      timeInterval = setInterval(updateClock, 1000);
+    updateClock(); // тут вызываем функцию чтоб небыло дергания таймера при перезагрузке страницы
+
+    function updateClock() {
+      const t = getTimeRemaining(endtime);
+      days.textContent = addZero(t.days);
+      hours.textContent = addZero(t.hours);
+      minutes.textContent = addZero(t.minutes);
+      seconds.textContent = addZero(t.seconds);
+      if (t.total <= 0) {
+        days.textComtent = "00";
+        hours.textComtent = "00";
+        minutes.textComtent = "00";
+        seconds.textComtent = "00";
+        clearInterval(timeInterval);
+      }
+    }
+    ;
+  };
+  setClock(id, deadline);
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (timer);
 
 /***/ }),
 
@@ -14081,6 +14272,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_modals__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./modules/modals */ "./src/js/modules/modals.js");
 /* harmony import */ var _modules_tabs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/tabs */ "./src/js/modules/tabs.js");
 /* harmony import */ var _modules_forms__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/forms */ "./src/js/modules/forms.js");
+/* harmony import */ var _modules_changeModalState__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modules/changeModalState */ "./src/js/modules/changeModalState.js");
+/* harmony import */ var _modules_timer__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./modules/timer */ "./src/js/modules/timer.js");
+
+
 
 
 
@@ -14088,10 +14283,16 @@ __webpack_require__.r(__webpack_exports__);
 window.addEventListener('DOMContentLoaded', () => {
   'use strict';
 
+  let modalState = {}; // этот обьект постоянно модифицируется при помощи модуля "  changeModalState(modalState)" (см.ниже)
+  let deadline = '2024-05-20';
+  (0,_modules_changeModalState__WEBPACK_IMPORTED_MODULE_4__["default"])(modalState);
   (0,_modules_modals__WEBPACK_IMPORTED_MODULE_1__["default"])();
   (0,_modules_tabs__WEBPACK_IMPORTED_MODULE_2__["default"])('.glazing_slider', '.glazing_block', '.glazing_content', 'active');
   (0,_modules_tabs__WEBPACK_IMPORTED_MODULE_2__["default"])('.decoration_slider', '.no_click', '.decoration_content > div > div', 'after_click');
-  (0,_modules_forms__WEBPACK_IMPORTED_MODULE_3__["default"])();
+  (0,_modules_tabs__WEBPACK_IMPORTED_MODULE_2__["default"])('.balcon_icons', '.balcon_icons_img', '.big_img > img', 'do_image_more', 'inline-block');
+  (0,_modules_forms__WEBPACK_IMPORTED_MODULE_3__["default"])(modalState); //modalState помещен сюда чтоб с ним работать внутри форм
+  (0,_modules_timer__WEBPACK_IMPORTED_MODULE_5__["default"])('.container1', deadline);
+  console.log('qwe');
 });
 })();
 

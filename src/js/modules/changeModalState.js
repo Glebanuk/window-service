@@ -8,12 +8,12 @@ import checkNumInputs from "./checkNumInputs";
         windowType = document.querySelectorAll('#view_type'),
         windowProfile = document.querySelectorAll('.checkbox'),
         form = document.querySelector('[data-calc = "end"]');
-        
-        
+ 
+ 
 
         checkNumInputs('#width');
         checkNumInputs('#height');
-        
+ 
         function bindActionToElems(event, elem, prop)   {
           elem.forEach((item, i) =>  { // индекс нужен для выявления в какую картинку окна нажал пользователь
             item.addEventListener(event,  ()  =>  {
@@ -58,10 +58,7 @@ import checkNumInputs from "./checkNumInputs";
           };
           form.addEventListener('submit', clearStateAndCloseWindow);
 
-         
 
-
-       
           bindActionToElems('click', windowForm, 'form ');
           bindActionToElems('input', windowWidth, 'width ');
           bindActionToElems('input', windowHeight, 'height');
