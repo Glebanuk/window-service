@@ -227,7 +227,9 @@ const modals = () => {
       // можно повесить на несколько селекторов одни и те же функции 
       modal = document.querySelector(modalSelector),
       close = document.querySelector(closeSelector),
-      windows = document.querySelectorAll('[data-modal]'); // получаем все модальные окна чтоб они не наслаивались друг на друга как в modal_calc
+      windows = document.querySelectorAll('[data-modal]'),
+      // получаем все модальные окна чтоб они не наслаивались друг на друга как в modal_calc
+      scroll = calcScroll(); // чтоб страница не дургалась при исчезновении скрола
 
     trigger.forEach(item => {
       item.addEventListener('click', e => {
@@ -240,6 +242,7 @@ const modals = () => {
         });
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
+        document.body.style.marginRight = `${scroll}px`; //// чтоб страница не дургалась при исчезновении скрола
 
         // document.body.classList.add('modal-open');
       });
@@ -247,6 +250,8 @@ const modals = () => {
     close.addEventListener('click', () => {
       modal.style.display = 'none';
       document.body.style.overflow = '';
+      document.body.style.marginRight = `0px`;
+
       // document.body.classList.remove('modal-open');
     });
     modal.addEventListener('click', e => {
@@ -256,6 +261,8 @@ const modals = () => {
         });
         modal.style.display = 'none';
         document.body.style.overflow = '';
+        document.body.style.marginRight = `0px`;
+
         // document.body.classList.remove('modal-open');
       }
     });
@@ -265,6 +272,17 @@ const modals = () => {
       document.querySelector(selector).style.display = 'block';
       document.body.style.overflow = 'hidden';
     }, time);
+  }
+  function calcScroll() {
+    let div = document.createElement('div');
+    div.style.width = '50px';
+    div.style.height = '50px';
+    div.style.overflowY = 'scroll';
+    div.style.visibility = 'hidden';
+    document.body.appendChild(div);
+    let scrollWidth = div.offsetWidth - div.clientWidth;
+    div.remove();
+    return scrollWidth;
   }
   bindModal('.popup_engineer_btn', '.popup_engineer', '.popup_engineer .popup_close'); // вместо переменных передаем сразу селекторы. И функция становится универсальной для открытия окон при клике на другие тригеры.
   bindModal('.phone_link', '.popup', '.popup .popup_close');
