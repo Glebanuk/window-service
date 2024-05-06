@@ -34,7 +34,7 @@ const timer  = (id, deadline) =>  {
           seconds  = timer.querySelector("#seconds"),
           timeInterval  = setInterval(updateClock, 1000);
 
-          updateClock(); // тут вызываем функцию чтоб небыло дергания таймера при перезагрузке страницы
+          updateClock(); // тут вызываем функцию чтоб небыло дергания таймера при перезагрузке страницы 
 
       function  updateClock() {
         const t = getTimeRemaining(endtime);
